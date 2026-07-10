@@ -1,0 +1,71 @@
+# Workflow State Machine Specifications
+
+DocumentIndexingWorkflow:
+  initial_state: UPLOADED
+  states:
+    UPLOADED:
+      transitions:
+        - event: start_indexing
+          target: PROCESSING
+          guards: [file_exists == true, file_size_valid == true, file_type_supported == true]
+    PROCESSING:
+      transitions:
+        - event: indexing_complete
+          target: INDEXED
+        - event: indexing_failed
+          target: FAILED
+    INDEXED:
+      transitions:
+        - event: reindex
+          target: PROCESSING
+    FAILED:
+      transitions:
+        - event: retry
+          target: PROCESSING
+          guards: [retry_count < 3]
+        - event: delete
+          target: DELETED
+
+ConflictLifecycle:
+  initial_state: DETECTED
+  states:
+    DETECTED:
+      transitions:
+        - event: review
+          target: UNDER_REVIEW
+    UNDER_REVIEW:
+      transitions:
+        - event: resolve
+          target: RESOLVED
+          guards: [resolution_notes != null]
+        - event: dismiss
+          target: DISMISSED
+
+RecommendationLifecycle:
+  initial_state: PENDING
+  states:
+    PENDING:
+      transitions:
+        - event: approve
+          target: APPROVED
+        - event: reject
+          target: REJECTED
+          guards: [rejection_reason != null]
+    APPROVED:
+      transitions: []
+    REJECTED:
+      transitions: []
+
+ConversationLifecycle:
+  initial_state: ACTIVE
+  states:
+    ACTIVE:
+      transitions:
+        - event: archive
+          target: ARCHIVED
+    ARCHIVED:
+      transitions:
+        - event: unarchive
+          target: ACTIVE
+        - event: delete
+          target: DELETED

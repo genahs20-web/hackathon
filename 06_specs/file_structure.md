@@ -1,0 +1,106 @@
+# File Structure & Hierarchy
+
+```
+/backend
+  /app
+    /api
+      /routes
+        documents.py
+        chat.py
+        users.py
+        admin.py
+        conflicts.py
+        recommendations.py
+      /schemas
+        document.py
+        chat.py
+        user.py
+        conflict.py
+        recommendation.py
+    /services
+      document_service.py
+      chat_service.py
+      rag_service.py
+    /agents
+      supervisor_agent.py
+      document_analyzer_agent.py
+      knowledge_retriever_agent.py
+      conflict_detector_agent.py
+      recommendation_agent.py
+      summarization_agent.py
+      notification_agent.py
+    /database
+      models.py
+      session.py
+      init_db.py
+    /rag
+      loaders/
+        pdf_loader.py
+        docx_loader.py
+        pptx_loader.py
+        xlsx_loader.py
+        eml_loader.py
+      chunker.py
+      embedder.py
+      retriever.py
+      prompt_injection_filter.py
+    /middleware
+      audit.py
+    /config
+      settings.py
+      constants.py
+    main.py
+  requirements.txt
+  Dockerfile
+/frontend
+  /src
+    /components
+      Auth/
+      Layout/
+      Dashboard/
+      DocumentManager/
+      ChatInterface/
+      ConflictCard.tsx
+      RecommendationCard.tsx
+      ConversationSidebar.tsx
+    /pages
+      LoginPage.tsx
+      DashboardPage.tsx
+      ChatPage.tsx
+      DocumentsPage.tsx
+      RecommendationsPage.tsx
+      ConflictsPage.tsx
+      AdminPage.tsx
+      NotFoundPage.tsx
+    /services
+      api.ts
+      auth.ts
+      storage.ts
+    /hooks
+      useAuth.ts
+      useChat.ts
+      useDocuments.ts
+    /utils
+      validators.ts
+      formatters.ts
+      constants.ts
+    /styles
+      globals.css
+    App.tsx
+    main.tsx
+  package.json
+  Dockerfile
+/docker
+  docker-compose.yml
+/deliverables
+  01_requirements.md
+  02_architecture/
+  03_database/
+  04_story_decomposition.md
+  05_wireframes.md
+  06_specs/
+  07_working_software/  (symlinked to /backend, /frontend, /docker above)
+  08_test_scripts.csv
+  09_traceability_matrix.csv
+  10_code_quality_review/
+```

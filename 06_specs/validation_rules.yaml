@@ -1,0 +1,53 @@
+# Validation Rule Specifications
+
+ValidationRules:
+  UserQuery:
+    length_min: 1
+    length_max: 2000
+    forbidden_patterns:
+      - "<script.*?</script>"
+      - "(?i)DROP\\s+TABLE"
+      - "(?i)DELETE\\s+FROM"
+      - "(?i)ignore (all )?(previous|prior|above) instructions"
+      - "(?i)system prompt"
+    allowed_chars: "alphanumeric, spaces, punctuation"
+    error_message: "Invalid query format"
+
+  DocumentUpload:
+    allowed_extensions: [".pdf", ".docx", ".pptx", ".xlsx", ".eml"]
+    allowed_mime_types:
+      - "application/pdf"
+      - "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      - "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      - "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      - "message/rfc822"
+    file_size_max: 52428800
+    file_size_min: 1
+    scan_for_malware: true
+    error_message: "File must be PDF, DOCX, PPTX, XLSX, or EML, <= 50MB"
+
+  EmailInput:
+    pattern: "^[\\w.\\-]+@[\\w.\\-]+\\.\\w+$"
+    length_max: 254
+    required: true
+    error_message: "Invalid email format"
+
+  PasswordInput:
+    length_min: 8
+    require_upper: true
+    require_lower: true
+    require_digit: true
+    error_message: "Password must be 8+ characters with upper, lower, and a digit"
+
+  DocumentMetadata:
+    title: { length_min: 1, length_max: 255 }
+    tags: { type: array, max_items: 10, item_type: string }
+
+  ConflictResolutionNotes:
+    length_max: 2000
+    required: false
+
+  RecommendationRejectionReason:
+    length_min: 1
+    length_max: 500
+    required_when: "status == rejected"

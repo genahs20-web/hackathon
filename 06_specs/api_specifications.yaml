@@ -1,0 +1,224 @@
+# Deliverable 6: API Specifications (REST)
+# AI Knowledge Discovery & Decision Assistant
+
+openapi_summary:
+  base_url: /api
+  auth: "Bearer JWT (except /api/auth/register, /api/auth/login)"
+
+endpoints:
+
+  - path: /api/auth/register
+    method: POST
+    description: Register a new user
+    request:
+      body:
+        email: string
+        password: string
+        name: string
+        organization: string (optional)
+    response_200:
+      customer_id: uuid
+      email: string
+      message: "Account created"
+    errors:
+      400: "Invalid email or weak password"
+      409: "Email already registered"
+
+  - path: /api/auth/login
+    method: POST
+    description: Authenticate and receive JWT tokens
+    request:
+      body: { email: string, password: string }
+    response_200:
+      access_token: string
+      refresh_token: string
+      token_type: "bearer"
+      expires_in: 900
+    errors:
+      401: "Invalid credentials"
+
+  - path: /api/auth/me
+    method: GET
+    description: Get current authenticated user
+    auth: required
+    response_200: { customer_id: uuid, email: string, name: string, role: string }
+
+  - path: /api/auth/refresh
+    method: POST
+    description: Exchange refresh token for new access token
+    request:
+      body: { refresh_token: string }
+    response_200: { access_token: string, expires_in: 900 }
+    errors:
+      401: "Invalid or expired refresh token"
+
+  - path: /api/documents/upload
+    method: POST
+    description: Upload a document for processing (multi-format)
+    auth: required
+    request:
+      content_type: multipart/form-data
+      body:
+        file: "File (pdf|docx|pptx|xlsx|eml, max 50MB)"
+        metadata:
+          title: string (optional)
+          tags: array of string (optional, max 10)
+    response_200:
+      success: true
+      document_id: uuid
+      file_name: string
+      file_type: string
+      status: "uploaded"
+      message: "Document uploaded. Indexing started."
+    errors:
+      400: "Invalid file format"
+      413: "File too large"
+      401: "Unauthorized"
+      500: "Server error"
+    validation_rules:
+      - "file extension must be one of: pdf, docx, pptx, xlsx, eml"
+      - "file.size <= 52428800"
+      - "metadata.title length 1-255"
+      - "metadata.tags max 10 items"
+
+  - path: /api/documents
+    method: GET
+    description: List current user's documents
+    auth: required
+    query_params: { status: "optional filter", page: int, page_size: int }
+    response_200:
+      documents: "array of Document"
+      total: int
+
+  - path: /api/documents/{document_id}
+    method: GET
+    description: Get document details
+    auth: required
+    response_200: "Document object with chunk count and metadata"
+    errors:
+      404: "Document not found"
+      403: "Not the document owner"
+
+  - path: /api/documents/{document_id}
+    method: DELETE
+    description: Delete a document (cascades to chunks/embeddings)
+    auth: required
+    response_200: { success: true, message: "Document deleted" }
+    errors: { 404: "Document not found", 403: "Forbidden" }
+
+  - path: /api/documents/{document_id}/reindex
+    method: POST
+    description: Re-run the indexing pipeline for a document
+    auth: required
+    response_200: { success: true, status: "processing" }
+
+  - path: /api/chat
+    method: POST
+    description: Send a message to the AI assistant (streamed via SSE)
+    auth: required
+    request:
+      body:
+        conversation_id: uuid
+        message: string
+        context_documents: "array of uuid (optional)"
+    response_200:
+      message_id: uuid
+      response: string
+      sources:
+        - document_id: uuid
+          document_name: string
+          snippet: string
+          relevance_score: float
+      confidence: float
+      processing_time_ms: int
+    validation_rules:
+      - "message length 1-2000"
+      - "conversation_id must be a valid UUID owned by the caller"
+      - "input scanned for prompt-injection patterns and rejected/sanitized"
+    implementation_notes:
+      - "Streams tokens via Server-Sent Events"
+      - "Triggers conflict detection asynchronously when 3+ documents are in context"
+      - "Persists both user and assistant messages to chat_messages"
+
+  - path: /api/conversations
+    method: GET
+    description: List current user's conversations
+    auth: required
+    response_200: { conversations: "array of Conversation", total: int }
+
+  - path: /api/conversations
+    method: POST
+    description: Create a new conversation
+    auth: required
+    request: { body: { title: string (optional) } }
+    response_200: { conversation_id: uuid, title: string }
+
+  - path: /api/conversations/{conversation_id}
+    method: GET
+    description: Get full message history for a conversation
+    auth: required
+    response_200: { conversation_id: uuid, title: string, messages: "array of ChatMessage" }
+
+  - path: /api/conversations/{conversation_id}
+    method: DELETE
+    description: Archive/delete a conversation
+    auth: required
+    response_200: { success: true }
+
+  - path: /api/conflicts
+    method: GET
+    description: List conflicts for current user
+    auth: required
+    query_params: { severity: "optional filter", resolved: "optional bool filter" }
+    response_200: { conflicts: "array of Conflict" }
+
+  - path: /api/conflicts/{conflict_id}/resolve
+    method: POST
+    description: Mark a conflict as resolved
+    auth: required
+    request: { body: { resolution_notes: string } }
+    response_200: { success: true, resolved: true }
+
+  - path: /api/recommendations
+    method: GET
+    description: List recommendations for current user
+    auth: required
+    query_params: { status: "optional filter" }
+    response_200: { recommendations: "array of Recommendation" }
+
+  - path: /api/recommendations/{recommendation_id}
+    method: PATCH
+    description: Approve or reject a recommendation
+    auth: required
+    request: { body: { status: "approved | rejected", notes: "string (optional)" } }
+    response_200: { success: true, status: string }
+
+  - path: /api/admin/users
+    method: GET
+    description: List all users (admin only)
+    auth: required (role=admin)
+    response_200: { users: "array of Customer" }
+
+  - path: /api/admin/documents
+    method: GET
+    description: List all documents across all users (admin only)
+    auth: required (role=admin)
+    response_200: { documents: "array of Document" }
+
+  - path: /api/admin/audit-logs
+    method: GET
+    description: Search audit logs (admin only)
+    auth: required (role=admin)
+    query_params: { action: "optional", customer_id: "optional", date_from: "optional", date_to: "optional" }
+    response_200: { logs: "array of AuditLog" }
+
+  - path: /api/admin/reindex-all
+    method: POST
+    description: Trigger reindexing of all documents (admin only)
+    auth: required (role=admin)
+    response_200: { success: true, documents_queued: int }
+
+  - path: /health
+    method: GET
+    description: Health check (no auth)
+    response_200: { status: "ok", database: "ok", chromadb: "ok" }

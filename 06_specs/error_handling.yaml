@@ -1,0 +1,53 @@
+# Error Handling Specification
+
+ErrorCodes:
+  E001:
+    message: "Document not found"
+    status_code: 404
+    user_message: "The document you requested doesn't exist."
+    action: "Return to documents list"
+  E002:
+    message: "Insufficient permissions"
+    status_code: 403
+    user_message: "You don't have access to this document."
+    action: "Contact administrator"
+  E003:
+    message: "Document processing failed"
+    status_code: 422
+    user_message: "We couldn't process this file. Please check the format and try again."
+    action: "Upload a different file"
+  E004:
+    message: "AI service unavailable"
+    status_code: 503
+    user_message: "The AI service is temporarily unavailable. Please try again shortly."
+    action: "Retry automatically with backoff"
+  E005:
+    message: "Unsupported file format"
+    status_code: 400
+    user_message: "Only PDF, DOCX, PPTX, XLSX, and EML files are supported."
+    action: "Select a supported file"
+  E006:
+    message: "File too large"
+    status_code: 413
+    user_message: "Files must be 50MB or smaller."
+    action: "Reduce file size or split the document"
+  E007:
+    message: "Invalid or expired token"
+    status_code: 401
+    user_message: "Your session has expired. Please log in again."
+    action: "Redirect to login"
+  E008:
+    message: "Rate limit exceeded"
+    status_code: 429
+    user_message: "You're sending requests too quickly. Please slow down."
+    action: "Retry after Retry-After header duration"
+  E009:
+    message: "Conflict already resolved"
+    status_code: 409
+    user_message: "This conflict has already been marked resolved."
+    action: "Refresh the conflicts list"
+  E010:
+    message: "Prompt injection detected"
+    status_code: 400
+    user_message: "Your message could not be processed. Please rephrase your question."
+    action: "Log the attempt, do not forward to LLM"

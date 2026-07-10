@@ -1,0 +1,132 @@
+# Data Model Specifications (mirrors deliverables/03_database/ddl_statements.sql)
+
+Customer:
+  description: "A registered user of the system"
+  fields:
+    customer_id: { type: UUID, primary_key: true, generated: "uuid4()" }
+    email: { type: string, length: 254, required: true, unique: true, validation: "RFC 5322 email" }
+    name: { type: string, length: 255, required: true }
+    organization: { type: string, length: 255, required: false }
+    role: { type: enum, values: [user, admin], default: user }
+    hashed_password: { type: string, required: true }
+    is_active: { type: boolean, default: true }
+    created_at: { type: timestamp, auto_set: true }
+    updated_at: { type: timestamp, auto_set: true }
+  indexes: [[email], [created_at]]
+  relationships:
+    documents: { type: one_to_many, foreign_table: documents }
+    conversation_histories: { type: one_to_many, foreign_table: conversation_histories }
+
+Document:
+  description: "An uploaded enterprise document (PDF/DOCX/PPTX/XLSX/EML)"
+  fields:
+    document_id: { type: UUID, primary_key: true }
+    customer_id: { type: UUID, foreign_key: customers.customer_id, required: true }
+    file_name: { type: string, length: 255, required: true, validation: "match ^[\\w\\s.\\-()]+$" }
+    file_path: { type: string, required: true }
+    file_size: { type: integer, required: true, validation: "0 < size <= 52428800" }
+    file_type: { type: enum, values: [pdf, docx, pptx, xlsx, eml], default: pdf }
+    status: { type: enum, values: [uploaded, processing, indexed, failed], default: uploaded }
+    upload_date: { type: timestamp, auto_set: true }
+    indexed_date: { type: timestamp, required: false }
+    total_chunks: { type: integer, default: 0 }
+    metadata: { type: json, schema: { title: string, tags: array, category: string } }
+    created_at: { type: timestamp, auto_set: true }
+  indexes: [[customer_id, upload_date], [status]]
+  relationships:
+    document_chunks: { type: one_to_many, foreign_table: document_chunks }
+
+DocumentChunk:
+  description: "A ~500-token slice of a document's extracted text"
+  fields:
+    chunk_id: { type: UUID, primary_key: true }
+    document_id: { type: UUID, foreign_key: documents.document_id, required: true }
+    chunk_text: { type: text, required: true }
+    chunk_index: { type: integer, required: true }
+    created_at: { type: timestamp, auto_set: true }
+  indexes: [[document_id]]
+
+Embedding:
+  description: "Pointer from a chunk to its ChromaDB vector"
+  fields:
+    embedding_id: { type: UUID, primary_key: true }
+    chunk_id: { type: UUID, foreign_key: document_chunks.chunk_id, required: true }
+    chroma_vector_id: { type: string, required: true }
+    model_used: { type: string, default: "text-embedding-3-small" }
+    created_at: { type: timestamp, auto_set: true }
+  indexes: [[chunk_id]]
+
+Conversation:
+  description: "Chat conversation session"
+  fields:
+    conversation_id: { type: UUID, primary_key: true }
+    customer_id: { type: UUID, foreign_key: customers.customer_id }
+    title: { type: string, length: 255, default: "New Conversation" }
+    created_at: { type: timestamp }
+    updated_at: { type: timestamp }
+    is_archived: { type: boolean, default: false }
+  indexes: [[customer_id, created_at]]
+
+ChatMessage:
+  description: "A single message within a conversation"
+  fields:
+    message_id: { type: UUID, primary_key: true }
+    conversation_id: { type: UUID, foreign_key: conversation_histories.conversation_id }
+    sender_type: { type: enum, values: [user, assistant] }
+    message_text: { type: text, required: true, validation: "length <= 2000 for user messages" }
+    sources: { type: json, schema: "array of {document_id, document_name, snippet, relevance_score}" }
+    confidence_score: { type: decimal, precision: [3, 2], validation: "0.00-1.00" }
+    created_at: { type: timestamp }
+  indexes: [[conversation_id, created_at]]
+
+Conflict:
+  description: "A detected contradiction across 2+ documents"
+  fields:
+    conflict_id: { type: UUID, primary_key: true }
+    conversation_id: { type: UUID, foreign_key: conversation_histories.conversation_id, required: false }
+    customer_id: { type: UUID, foreign_key: customers.customer_id }
+    conflict_description: { type: text, required: true }
+    source_documents: { type: json, schema: "array of document_id, min 2 entries" }
+    severity: { type: enum, values: [low, medium, high], default: medium }
+    resolved: { type: boolean, default: false }
+    resolution_notes: { type: text, required: false }
+    created_at: { type: timestamp }
+  indexes: [[customer_id, severity, resolved]]
+
+Recommendation:
+  description: "An AI-generated actionable recommendation"
+  fields:
+    recommendation_id: { type: UUID, primary_key: true }
+    conversation_id: { type: UUID, foreign_key: conversation_histories.conversation_id, required: false }
+    customer_id: { type: UUID, foreign_key: customers.customer_id }
+    recommendation_text: { type: text, required: true }
+    confidence_score: { type: decimal, precision: [3, 2], validation: "0.00-1.00, required per BR-3" }
+    supporting_documents: { type: json }
+    status: { type: enum, values: [pending, approved, rejected], default: pending }
+    created_at: { type: timestamp }
+  indexes: [[customer_id, status]]
+
+Notification:
+  description: "An in-app notification for a user"
+  fields:
+    notification_id: { type: UUID, primary_key: true }
+    customer_id: { type: UUID, foreign_key: customers.customer_id }
+    notification_type: { type: string, length: 50 }
+    message: { type: text, required: true }
+    is_read: { type: boolean, default: false }
+    created_at: { type: timestamp }
+    read_at: { type: timestamp, required: false }
+  indexes: [[customer_id, is_read]]
+
+AuditLog:
+  description: "An immutable record of a system action, per BR-4"
+  fields:
+    log_id: { type: UUID, primary_key: true }
+    customer_id: { type: UUID, foreign_key: customers.customer_id, required: false }
+    action: { type: string, length: 100 }
+    entity_type: { type: string, length: 50 }
+    entity_id: { type: UUID, required: false }
+    details: { type: json, required: false }
+    ip_address: { type: string, length: 45, required: false }
+    created_at: { type: timestamp }
+  indexes: [[customer_id, action, created_at]]
