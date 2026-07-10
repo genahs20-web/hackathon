@@ -1,0 +1,365 @@
+INFO:     Started server process [16116]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53264 - "GET /api/admin/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53265 - "GET /api/admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53261 - "GET /api/admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49843 - "GET /api/admin/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49848 - "GET /api/admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49846 - "GET /api/admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59836 - "POST /api/admin/reindex-all HTTP/1.1" 200 OK
+ERROR:app.services.document_service:Indexing failed for document_id=554a696b-aefb-426e-ac5d-42c8e572b9cc
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\services\document_service.py", line 90, in index_document
+    text = extract_text(document.file_path, document.file_type)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\loaders\__init__.py", line 23, in extract_text
+    return loader(file_path)
+           ^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\loaders\eml_loader.py", line 9, in extract_text_from_eml
+    with open(file_path, encoding="utf-8", errors="ignore") as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/data/documents/seed_4.eml'
+ERROR:app.services.document_service:Indexing failed for document_id=d5e52379-ae0a-47a4-815e-e1d5d6c1ed88
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\services\document_service.py", line 90, in index_document
+    text = extract_text(document.file_path, document.file_type)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\loaders\__init__.py", line 23, in extract_text
+    return loader(file_path)
+           ^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\loaders\pptx_loader.py", line 8, in extract_text_from_pptx
+    presentation = Presentation(file_path)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\api.py", line 31, in Presentation
+    presentation_part = Package.open(pptx).main_document_part
+                        ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\package.py", line 82, in open
+    return cls(pkg_file)._load()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\package.py", line 160, in _load
+    pkg_xml_rels, parts = _PackageLoader.load(self._pkg_file, cast("Package", self))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\package.py", line 190, in load
+    return cls(pkg_file, package)._load()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\package.py", line 194, in _load
+    parts, xml_rels = self._parts, self._xml_rels
+                      ^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\util.py", line 191, in __get__
+    value = self._fget(obj)
+            ^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\package.py", line 222, in _parts
+    content_types = self._content_types
+                    ^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\util.py", line 191, in __get__
+    value = self._fget(obj)
+            ^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\package.py", line 207, in _content_types
+    return _ContentTypeMap.from_xml(self._package_reader[CONTENT_TYPES_URI])
+                                    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\serialized.py", line 38, in __getitem__
+    return self._blob_reader[pack_uri]
+           ^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\util.py", line 191, in __get__
+    value = self._fget(obj)
+            ^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\serialized.py", line 52, in _blob_reader
+    return _PhysPkgReader.factory(self._pkg_file)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\pptx\opc\serialized.py", line 144, in factory
+    raise PackageNotFoundError("Package not found at '%s'" % pkg_file)
+pptx.exc.PackageNotFoundError: Package not found at '/data/documents/seed_5.pptx'
+INFO:httpx:HTTP Request: POST https://genailab.tcs.in/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR:app.agents.document_analyzer_agent:Document Analyzer Agent: could not parse LLM response as JSON
+INFO:     127.0.0.1:64053 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64052 - "GET /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64056 - "GET /api/recommendations?status_filter=pending HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64055 - "GET /api/conflicts?resolved=false HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58615 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62092 - "GET /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52316 - "GET /api/recommendations?status_filter=pending HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52314 - "GET /api/conflicts?resolved=false HTTP/1.1" 200 OK
+ERROR:app.services.document_service:Indexing failed for document_id=8c97ead1-5ef7-4612-9507-325012fafdc1
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 236, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 134, in get_user_identity
+    return self._server.get_user_identity()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\telemetry\opentelemetry\__init__.py", line 150, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\fastapi.py", line 226, in get_user_identity
+    return UserIdentity(**self._make_request("get", "/auth/identity"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\fastapi.py", line 131, in _make_request
+    response = self._session.request(method, url, **cast(Any, kwargs))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 837, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 926, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 954, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 991, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 1027, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 235, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\services\document_service.py", line 101, in index_document
+    vector_id = index_chunk(chunk_row.chunk_id, document.document_id, document.file_name, chunk, document.customer_id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 37, in index_chunk
+    collection = _get_collection()
+                 ^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 32, in _get_collection
+    return _get_client().get_or_create_collection(name=settings.chroma_collection_name)
+           ^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 28, in _get_client
+    return chromadb.HttpClient(host=settings.chroma_host, port=settings.chroma_port)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\__init__.py", line 311, in HttpClient
+    return ClientCreator(tenant=tenant, database=database, settings=settings)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 79, in __init__
+    user_identity = self.get_user_identity()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 136, in get_user_identity
+    raise ValueError(
+ValueError: Could not connect to a Chroma server. Are you sure it is running?
+INFO:     127.0.0.1:65420 - "GET /api/documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56221 - "GET /api/documents HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://genailab.tcs.in/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR:app.agents.document_analyzer_agent:Document Analyzer Agent: could not parse LLM response as JSON
+ERROR:app.services.document_service:Indexing failed for document_id=13532a8f-ca4a-4bac-9d93-8fee8ed08b3e
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 236, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 134, in get_user_identity
+    return self._server.get_user_identity()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\telemetry\opentelemetry\__init__.py", line 150, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\fastapi.py", line 226, in get_user_identity
+    return UserIdentity(**self._make_request("get", "/auth/identity"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\fastapi.py", line 131, in _make_request
+    response = self._session.request(method, url, **cast(Any, kwargs))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 837, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 926, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 954, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 991, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 1027, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 235, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\services\document_service.py", line 101, in index_document
+    vector_id = index_chunk(chunk_row.chunk_id, document.document_id, document.file_name, chunk, document.customer_id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 37, in index_chunk
+    collection = _get_collection()
+                 ^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 32, in _get_collection
+    return _get_client().get_or_create_collection(name=settings.chroma_collection_name)
+           ^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 28, in _get_client
+    return chromadb.HttpClient(host=settings.chroma_host, port=settings.chroma_port)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\__init__.py", line 311, in HttpClient
+    return ClientCreator(tenant=tenant, database=database, settings=settings)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 79, in __init__
+    user_identity = self.get_user_identity()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 136, in get_user_identity
+    raise ValueError(
+ValueError: Could not connect to a Chroma server. Are you sure it is running?
+INFO:httpx:HTTP Request: POST https://genailab.tcs.in/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR:app.agents.document_analyzer_agent:Document Analyzer Agent: could not parse LLM response as JSON
+ERROR:app.services.document_service:Indexing failed for document_id=a34ae29c-9149-4771-beb4-e3e6b09884df
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 236, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 101, in handle_request
+    raise exc
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 78, in handle_request
+    stream = self._connect(request)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_sync\connection.py", line 124, in _connect
+    stream = self._network_backend.connect_tcp(**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_backends\sync.py", line 207, in connect_tcp
+    with map_exceptions(exc_map):
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ConnectError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 134, in get_user_identity
+    return self._server.get_user_identity()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\telemetry\opentelemetry\__init__.py", line 150, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\fastapi.py", line 226, in get_user_identity
+    return UserIdentity(**self._make_request("get", "/auth/identity"))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\fastapi.py", line 131, in _make_request
+    response = self._session.request(method, url, **cast(Any, kwargs))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 837, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 926, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 954, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 991, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_client.py", line 1027, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 235, in handle_request
+    with map_httpcore_exceptions():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ConnectError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\services\document_service.py", line 101, in index_document
+    vector_id = index_chunk(chunk_row.chunk_id, document.document_id, document.file_name, chunk, document.customer_id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 37, in index_chunk
+    collection = _get_collection()
+                 ^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 32, in _get_collection
+    return _get_client().get_or_create_collection(name=settings.chroma_collection_name)
+           ^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\app\rag\retriever.py", line 28, in _get_client
+    return chromadb.HttpClient(host=settings.chroma_host, port=settings.chroma_port)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\__init__.py", line 311, in HttpClient
+    return ClientCreator(tenant=tenant, database=database, settings=settings)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 79, in __init__
+    user_identity = self.get_user_identity()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\GenAICHNKPRUSR03.01HW2555059\Documents\Hackathon\deliverables\07_working_software\backend\.venv\Lib\site-packages\chromadb\api\client.py", line 136, in get_user_identity
+    raise ValueError(
+ValueError: Could not connect to a Chroma server. Are you sure it is running?

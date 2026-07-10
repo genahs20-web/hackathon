@@ -1,0 +1,24 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+email-validator==2.2.0
+pydantic-settings==2.5.2
+sqlalchemy==2.0.35
+chromadb>=0.5.15
+langchain==0.3.1
+langgraph==0.2.28
+langchain-openai==0.2.1
+openai==1.51.0
+httpx==0.27.2  # openai 1.51.0's http client wrapper passes `proxies=` which httpx>=0.28 removed
+pyjwt==2.9.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-multipart==0.0.9
+tiktoken==0.7.0
+pip-system-certs==5.3  # Windows: trust the corporate/OS certificate store for outbound HTTPS (tiktoken BPE download, etc.)
+pypdf==5.0.1
+pdf2image==1.17.0
+pytesseract==0.3.13
+python-docx==1.1.2
+python-pptx==1.0.2
+openpyxl==3.1.5
