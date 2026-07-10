@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+
+  backend:
+    build:
+      context: ../backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:///./data/app.db
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: 8000
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      CORS_ALLOW_ORIGINS: '["http://localhost:5173","http://localhost:80"]'
+    volumes:
+      - sqlite_data:/app/data
+    depends_on:
+      - chromadb
+
+  frontend:
+    build:
+      context: ../frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  sqlite_data:
+  chroma_data:
