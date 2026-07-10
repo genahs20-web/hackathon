@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG Intelligence Platform — Architecture Drawing Set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A1220;
+    --panel:#0E1A2C;
+    --panel-2:#0B1523;
+    --grid:rgba(111,168,220,0.07);
+    --grid-major:rgba(111,168,220,0.14);
+    --cyan:#4FD1C5;
+    --blue:#6FA8DC;
+    --amber:#E3A857;
+    --white:#EAF2F8;
+    --muted:#7189A6;
+    --dim:#3C4C64;
+    --hair:rgba(113,137,166,0.28);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--white);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+
+  /* ---------- layout shell ---------- */
+  .drafting-table{
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ---------- sidebar / sheet index ---------- */
+  .sheet-index{
+    position:fixed;
+    top:0; left:0; bottom:0;
+    width:172px;
+    border-right:1px solid var(--hair);
+    background:linear-gradient(180deg, var(--panel-2), var(--ink));
+    padding:22px 0 16px;
+    z-index:40;
+    overflow-y:auto;
+  }
+  .sheet-index .idx-brand{
+    padding:0 18px 16px;
+    border-bottom:1px solid var(--hair);
+    margin-bottom:10px;
+  }
+  .sheet-index .idx-brand .mk{
+    width:26px;height:26px;border:1.4px solid var(--cyan);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;letter-spacing:0.5px;color:var(--cyan);
+    transform:rotate(45deg); margin-bottom:10px;
+  }
+  .sheet-index .idx-brand .mk span{transform:rotate(-45deg);}
+  .sheet-index .idx-brand .name{font-size:10.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;line-height:1.5;}
+  .idx-list{list-style:none;margin:0;padding:0;}
+  .idx-list a{
+    display:block;
+    padding:9px 18px;
+    text-decoration:none;
+    color:var(--muted);
+    font-size:11px;
+    letter-spacing:0.5px;
+    border-left:2px solid transparent;
+    transition:color .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .idx-list a .num{color:var(--dim);display:block;font-size:10px;margin-bottom:2px;}
+  .idx-list a:hover{color:var(--white); background:rgba(79,209,197,0.05);}
+  .idx-list a.active{color:var(--cyan); border-left-color:var(--cyan); background:rgba(79,209,197,0.07);}
+  .idx-list a.active .num{color:var(--cyan);}
+
+  /* ---------- main scroll area ---------- */
+  main{
+    margin-left:172px;
+    width:calc(100% - 172px);
+    scroll-snap-type:y proximity;
+  }
+
+  .sheet{
+    position:relative;
+    min-height:100vh;
+    padding:64px 64px 0;
+    display:flex;
+    flex-direction:column;
+    border-bottom:1px solid var(--hair);
+    scroll-snap-align:start;
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(0deg, var(--grid-major) 0 1px, transparent 1px 200px),
+      repeating-linear-gradient(90deg, var(--grid-major) 0 1px, transparent 1px 200px);
+  }
+
+  /* corner registration marks */
+  .reg{position:absolute; width:22px; height:22px; opacity:0.55;}
+  .reg::before,.reg::after{content:"";position:absolute;background:var(--cyan);}
+  .reg::before{width:100%;height:1px;top:50%;}
+  .reg::after{height:100%;width:1px;left:50%;}
+  .reg.tl{top:22px; left:22px;}
+  .reg.tr{top:22px; right:22px;}
+  .reg.bl{bottom:96px; left:22px;}
+  .reg.br{bottom:96px; right:22px;}
+
+  .sheet-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--hair);
+    margin-bottom:28px;
+  }
+  .sheet-header .eyebrow{
+    font-size:11.5px; letter-spacing:3px; color:var(--cyan);
+    margin-bottom:10px; display:flex; align-items:center; gap:10px;
+  }
+  .sheet-header .eyebrow::before{content:"";width:22px;height:1px;background:var(--cyan);display:inline-block;}
+  .sheet-header h1{
+    font-size:clamp(28px,3.4vw,44px);
+    margin:0 0 8px;
+    letter-spacing:0.3px;
+    font-weight:700;
+    text-transform:uppercase;
+  }
+  .sheet-header p.sub{margin:0; color:var(--muted); font-size:14.5px; max-width:640px; line-height:1.5;}
+  .sheet-header .scale-tag{
+    text-align:right; color:var(--muted); font-size:11px; letter-spacing:1px;
+    white-space:nowrap;
+  }
+  .sheet-header .scale-tag b{display:block; color:var(--white); font-size:13px; margin-bottom:4px;}
+
+  .sheet-body{
+    flex:1;
+    display:grid;
+    grid-template-columns:1.55fr 1fr;
+    gap:34px;
+    padding-bottom:40px;
+    align-items:start;
+  }
+  @media (max-width:980px){
+    .sheet-body{grid-template-columns:1fr;}
+  }
+
+  .diagram-frame{
+    border:1px solid var(--hair);
+    background:rgba(14,26,44,0.5);
+    padding:18px 18px 14px;
+    position:relative;
+  }
+  .diagram-frame .tag{
+    position:absolute; top:-11px; left:16px; background:var(--ink);
+    padding:0 8px; font-size:10px; letter-spacing:2px; color:var(--dim);
+  }
+  svg.diagram{width:100%; height:auto; display:block; overflow:visible;}
+
+  .side-panel{display:flex; flex-direction:column; gap:20px;}
+  .panel-card{border:1px solid var(--hair); background:rgba(14,26,44,0.35); padding:16px 18px;}
+  .panel-card h3{
+    margin:0 0 12px; font-size:11px; letter-spacing:2px; color:var(--amber);
+    text-transform:uppercase; display:flex; align-items:center; gap:8px;
+  }
+  .panel-card h3::before{content:"§";color:var(--dim);}
+
+  table.spec{width:100%; border-collapse:collapse; font-size:12px;}
+  table.spec th{
+    text-align:left; font-weight:500; color:var(--muted); font-size:10px;
+    letter-spacing:1px; text-transform:uppercase; padding:0 8px 8px 0;
+    border-bottom:1px solid var(--hair);
+  }
+  table.spec td{
+    padding:8px 8px 8px 0; border-bottom:1px solid rgba(113,137,166,0.14);
+    color:var(--white); vertical-align:top; line-height:1.4;
+  }
+  table.spec tr:last-child td{border-bottom:none;}
+  table.spec td.k{color:var(--cyan); white-space:nowrap; font-family:'IBM Plex Mono',monospace; font-size:11px;}
+
+  ol.steps{margin:0; padding-left:18px; font-size:12.5px; color:var(--muted); line-height:1.9;}
+  ol.steps li::marker{color:var(--cyan); font-family:'IBM Plex Mono',monospace;}
+  ol.steps b{color:var(--white); font-weight:500;}
+
+  .callout{
+    border-left:2px solid var(--amber); padding:2px 0 2px 14px; font-size:12px;
+    color:var(--muted); line-height:1.6;
+  }
+  .callout b{color:var(--amber); font-weight:500;}
+
+  /* title block, like a real drawing set */
+  .title-block{
+    height:72px;
+    border-top:1px solid var(--hair);
+    display:grid;
+    grid-template-columns:2fr repeat(4,1fr);
+    align-items:stretch;
+    margin-top:auto;
+    font-size:11px;
+  }
+  .title-block .tb-cell{
+    border-left:1px solid var(--hair);
+    padding:10px 16px;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .title-block .tb-cell:first-child{border-left:none;}
+  .title-block .tb-label{color:var(--dim); font-size:9.5px; letter-spacing:1.5px; margin-bottom:4px;}
+  .title-block .tb-value{color:var(--white);}
+  .title-block .tb-value.accent{color:var(--cyan);}
+
+  /* ---------- diagram element language (reused across all SVGs) ---------- */
+  .n-rect{fill:var(--panel); stroke:var(--blue); stroke-width:1.3;}
+  .n-rect.hi{stroke:var(--cyan);}
+  .n-rect.warn{stroke:var(--amber);}
+  .n-text{fill:var(--white); font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  .n-sub{fill:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:9.5px;}
+  .lane-label{fill:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px;}
+  .lane-box{fill:none; stroke:var(--hair); stroke-width:1; stroke-dasharray:3 4;}
+  .edge{fill:none; stroke:var(--blue); stroke-width:1.2;}
+  .edge.strong{stroke:var(--cyan);}
+  .edge-label{fill:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:9.5px;}
+  .store{fill:var(--panel); stroke:var(--cyan); stroke-width:1.3;}
+  .ext-rect{fill:var(--panel); stroke:var(--amber); stroke-width:1.3; stroke-dasharray:5 3;}
+  .diamond{fill:var(--panel); stroke:var(--amber); stroke-width:1.3;}
+
+  /* ---------- cover-specific ---------- */
+  .cover-hero{
+    display:grid; grid-template-columns:1.2fr 1fr; gap:48px; align-items:center;
+    padding:20px 0 40px;
+    flex:1;
+  }
+  .cover-hero h1{
+    font-size:clamp(38px,5.2vw,68px); line-height:1.02; margin:0 0 22px;
+    text-transform:uppercase; font-weight:700; letter-spacing:0.2px;
+  }
+  .cover-hero h1 span{color:var(--cyan);}
+  .cover-hero p{color:var(--muted); font-size:15.5px; line-height:1.7; max-width:520px; margin:0 0 26px;}
+  .meta-row{display:flex; gap:36px; flex-wrap:wrap;}
+  .meta-row div{font-size:11px; color:var(--dim); letter-spacing:1.5px;}
+  .meta-row div b{display:block; color:var(--white); font-size:14px; letter-spacing:0; margin-top:4px; font-family:'IBM Plex Mono',monospace;}
+
+  .drawing-index{list-style:none; margin:0; padding:0; border:1px solid var(--hair);}
+  .drawing-index li{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:13px 18px; border-bottom:1px solid var(--hair); font-size:13px;
+  }
+  .drawing-index li:last-child{border-bottom:none;}
+  .drawing-index a{color:var(--white); text-decoration:none;}
+  .drawing-index a:hover{color:var(--cyan);}
+  .drawing-index .sh{color:var(--cyan); font-family:'IBM Plex Mono',monospace; font-size:12px; margin-right:14px;}
+  .drawing-index .rev{color:var(--dim); font-family:'IBM Plex Mono',monospace; font-size:10.5px;}
+
+  .legend-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px 30px;}
+  .legend-item{display:flex; align-items:center; gap:12px; font-size:12.5px; color:var(--muted);}
+  .legend-item svg{flex:none;}
+  .legend-item b{color:var(--white); font-weight:500;}
+
+  .scroll-hint{
+    position:fixed; bottom:18px; right:26px; z-index:30;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--dim);
+    letter-spacing:1.5px; writing-mode:vertical-rl;
+  }
+
+  @media (max-width:760px){
+    .sheet-index{width:56px;}
+    .sheet-index .idx-brand{padding:0 8px 12px;}
+    .sheet-index .idx-brand .name{display:none;}
+    .idx-list a{padding:10px 6px; font-size:0;}
+    .idx-list a .num{font-size:9px;}
+    main{margin-left:56px; width:calc(100% - 56px);}
+    .sheet{padding:44px 20px 0;}
+    .cover-hero{grid-template-columns:1fr;}
+    .title-block{grid-template-columns:1fr 1fr; height:auto;}
+    .title-block .tb-cell{border-left:none; border-top:1px solid var(--hair); padding:8px 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="drafting-table">
+  <nav class="sheet-index">
+    <div class="idx-brand">
+      <div class="mk"><span>R</span></div>
+      <div class="name">Drawing Set<br>Rev. 1 — 2026</div>
+    </div>
+    <ul class="idx-list" id="idxList">
+      <li><a href="#cover"><span class="num">A-100</span>Cover &amp; Index</a></li>
+      <li><a href="#logical"><span class="num">A-101</span>Logical Architecture</a></li>
+      <li><a href="#technical"><span class="num">A-102</span>Technical Architecture</a></li>
+      <li><a href="#agents"><span class="num">A-103</span>Agent Workflow</a></li>
+      <li><a href="#ingestion"><span class="num">A-104</span>Data Flow — Ingest</a></li>
+      <li><a href="#query"><span class="num">A-105</span>Data Flow — Query</a></li>
+      <li><a href="#security"><span class="num">A-106</span>Security Architecture</a></li>
+      <li><a href="#deployment"><span class="num">A-107</span>Deployment</a></li>
+      <li><a href="#legend"><span class="num">A-108</span>Legend &amp; Stack</a></li>
+    </ul>
+  </nav>
+
+  <main id="main">
+
+    <!-- ============ A-100 COVER ============ -->
+    <section class="sheet" id="cover">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-100 · COVER</div>
+          <h1 style="font-size:20px; margin:0;">Drawing Set Overview</h1>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>Not to Scale</div>
+      </div>
+
+      <div class="cover-hero">
+        <div>
+          <h1>RAG Intelligence<br><span>Platform</span></h1>
+          <p>A document intelligence system built on a seven-agent LangGraph orchestration layer, retrieval-augmented generation over ChromaDB, and a FastAPI + React service boundary. This set documents the logical, technical, workflow, data, security, and deployment views of the system.</p>
+          <div class="meta-row mono">
+            <div>PROJECT<b>RAG-INTEL-01</b></div>
+            <div>DRAWN BY<b>Claude</b></div>
+            <div>DATE<b>2026-07-10</b></div>
+            <div>REVISION<b>1</b></div>
+            <div>SHEETS<b>009</b></div>
+          </div>
+        </div>
+        <ul class="drawing-index mono">
+          <li><span><span class="sh">A-101</span><a href="#logical">Logical Architecture</a></span><span class="rev">4 LAYERS</span></li>
+          <li><span><span class="sh">A-102</span><a href="#technical">Technical Architecture</a></span><span class="rev">8 COMPONENTS</span></li>
+          <li><span><span class="sh">A-103</span><a href="#agents">Agent Workflow</a></span><span class="rev">7 AGENTS</span></li>
+          <li><span><span class="sh">A-104</span><a href="#ingestion">Data Flow — Ingestion</a></span><span class="rev">FLOW 1</span></li>
+          <li><span><span class="sh">A-105</span><a href="#query">Data Flow — Query &amp; Retrieval</a></span><span class="rev">FLOW 2</span></li>
+          <li><span><span class="sh">A-106</span><a href="#security">Security Architecture</a></span><span class="rev">9 CONTROLS</span></li>
+          <li><span><span class="sh">A-107</span><a href="#deployment">Deployment Architecture</a></span><span class="rev">3 SERVICES</span></li>
+          <li><span><span class="sh">A-108</span><a href="#legend">Legend &amp; Stack Index</a></span><span class="rev">REF</span></li>
+        </ul>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell">
+          <div class="tb-label">PROJECT</div>
+          <div class="tb-value accent">RAG Intelligence Platform — Architecture Drawing Set</div>
+        </div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-100</div></div>
+        <div class="tb-cell"><div class="tb-label">SCALE</div><div class="tb-value">NTS</div></div>
+        <div class="tb-cell"><div class="tb-label">DRAWN</div><div class="tb-value">Claude</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-101 LOGICAL ARCHITECTURE ============ -->
+    <section class="sheet" id="logical">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-101 · LOGICAL VIEW</div>
+          <h1>Logical Architecture</h1>
+          <p class="sub">Four layers — presentation, application, data, and external services — separated by responsibility, not by process boundary.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>4 Layers</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-101.1 — LAYER DIAGRAM</span>
+          <svg class="diagram" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="a101" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6FA8DC"/></marker></defs>
+
+            <rect class="lane-box" x="20" y="16" width="860" height="118"/>
+            <text class="lane-label" x="32" y="36">PRESENTATION LAYER</text>
+            <rect class="n-rect hi" x="60" y="56" width="270" height="58" rx="3"/>
+            <text class="n-text" x="195" y="82" text-anchor="middle">React 18 + TypeScript SPA</text>
+            <text class="n-sub" x="195" y="99" text-anchor="middle">client state · routing</text>
+            <rect class="n-rect" x="410" y="56" width="270" height="58" rx="3"/>
+            <text class="n-text" x="545" y="82" text-anchor="middle">TailwindCSS UI Components</text>
+            <text class="n-sub" x="545" y="99" text-anchor="middle">design system</text>
+            <path class="edge" d="M410,85 L340,85" marker-end="url(#a101)"/>
+
+            <rect class="lane-box" x="20" y="160" width="860" height="140"/>
+            <text class="lane-label" x="32" y="180">APPLICATION LAYER</text>
+            <rect class="n-rect hi" x="55" y="200" width="220" height="58" rx="3"/>
+            <text class="n-text" x="165" y="226" text-anchor="middle">FastAPI REST API</text>
+            <text class="n-sub" x="165" y="243" text-anchor="middle">endpoints</text>
+            <rect class="n-rect hi" x="335" y="200" width="220" height="58" rx="3"/>
+            <text class="n-text" x="445" y="226" text-anchor="middle">Business Logic Services</text>
+            <text class="n-sub" x="445" y="243" text-anchor="middle">rules · validation</text>
+            <rect class="n-rect hi" x="615" y="200" width="240" height="58" rx="3"/>
+            <text class="n-text" x="735" y="226" text-anchor="middle">LangGraph Orchestration</text>
+            <text class="n-sub" x="735" y="243" text-anchor="middle">7 agents</text>
+            <path class="edge" d="M275,229 L335,229" marker-end="url(#a101)"/>
+            <path class="edge" d="M555,229 L615,229" marker-end="url(#a101)"/>
+            <path class="edge strong" d="M195,114 L195,160 L165,160 L165,200" marker-end="url(#a101)"/>
+            <text class="edge-label" x="200" y="150">HTTPS/REST + SSE</text>
+
+            <rect class="lane-box" x="20" y="322" width="860" height="120"/>
+            <text class="lane-label" x="32" y="342">DATA LAYER</text>
+            <ellipse class="store" cx="200" cy="380" rx="90" ry="16"/>
+            <path class="store" d="M110,380 L110,410 A90,16 0 0 0 290,410 L290,380"/>
+            <text class="n-text" x="200" y="386" text-anchor="middle" font-size="11">SQLite</text>
+            <text class="n-sub" x="200" y="424" text-anchor="middle">relational data</text>
+            <ellipse class="store" cx="600" cy="380" rx="110" ry="16"/>
+            <path class="store" d="M490,380 L490,410 A110,16 0 0 0 710,410 L710,380"/>
+            <text class="n-text" x="600" y="386" text-anchor="middle" font-size="11">ChromaDB</text>
+            <text class="n-sub" x="600" y="424" text-anchor="middle">vector store</text>
+            <path class="edge" d="M445,258 L445,300 L200,300 L200,364" marker-end="url(#a101)"/>
+            <text class="edge-label" x="250" y="296">CRUD</text>
+            <path class="edge" d="M735,258 L735,300 L600,300 L600,364" marker-end="url(#a101)"/>
+            <text class="edge-label" x="640" y="296">semantic search</text>
+
+            <rect class="ext-rect" x="290" y="510" width="320" height="58" rx="3"/>
+            <text class="n-text" x="450" y="536" text-anchor="middle">OpenAI API / Azure OpenAI</text>
+            <text class="n-sub" x="450" y="553" text-anchor="middle">external service</text>
+            <path class="edge" d="M735,258 L735,490 L450,490 L450,510" marker-end="url(#a101)"/>
+            <text class="edge-label" x="700" y="486">embeddings, completions</text>
+          </svg>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Layer Responsibility</h3>
+            <table class="spec">
+              <tr><th>Layer</th><th>Responsibility</th></tr>
+              <tr><td class="k">Presentation</td><td>Renders UI, manages client state, streams responses</td></tr>
+              <tr><td class="k">Application</td><td>Exposes REST/SSE, enforces rules, orchestrates 7 agents</td></tr>
+              <tr><td class="k">Data</td><td>Persists relational entities and vector embeddings</td></tr>
+              <tr><td class="k">External</td><td>LLM completions and embedding generation</td></tr>
+            </table>
+          </div>
+          <div class="panel-card">
+            <h3>Reading This Sheet</h3>
+            <p class="callout">Solid cyan-bordered nodes are internally owned services. <b>Amber dashed</b> border marks an external, third-party dependency (see A-108 for the full legend).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-101</div></div>
+        <div class="tb-cell"><div class="tb-label">VIEW</div><div class="tb-value">Logical</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">logical_diagram.md</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-102 TECHNICAL ARCHITECTURE ============ -->
+    <section class="sheet" id="technical">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-102 · COMPONENT VIEW</div>
+          <h1>Technical Architecture</h1>
+          <p class="sub">Frontend, backend, data stores and external providers, traced through a single chat-query request.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>8 Components</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-102.1 — COMPONENT DIAGRAM</span>
+          <svg class="diagram" viewBox="0 0 960 560" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="a102" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6FA8DC"/></marker></defs>
+
+            <rect class="lane-box" x="20" y="20" width="220" height="480"/>
+            <text class="lane-label" x="32" y="42">FRONTEND · VITE/REACT</text>
+            <rect class="n-rect hi" x="45" y="70" width="170" height="46" rx="3"/><text class="n-text" x="130" y="98" text-anchor="middle" font-size="11">Pages / Components</text>
+            <rect class="n-rect" x="45" y="150" width="170" height="46" rx="3"/><text class="n-text" x="130" y="178" text-anchor="middle" font-size="11">api.ts — Axios client</text>
+            <rect class="n-rect" x="45" y="230" width="170" height="46" rx="3"/><text class="n-text" x="130" y="258" text-anchor="middle" font-size="11">auth.ts — JWT store</text>
+            <path class="edge" d="M130,116 L130,150" marker-end="url(#a102)"/>
+            <path class="edge" d="M130,196 L130,230" marker-end="url(#a102)"/>
+
+            <rect class="lane-box" x="280" y="20" width="380" height="480"/>
+            <text class="lane-label" x="292" y="42">BACKEND · FASTAPI / PY3.12</text>
+            <rect class="n-rect hi" x="305" y="70" width="330" height="42" rx="3"/><text class="n-text" x="470" y="96" text-anchor="middle" font-size="11">API Routes</text>
+            <rect class="n-rect" x="305" y="132" width="330" height="42" rx="3"/><text class="n-text" x="470" y="158" text-anchor="middle" font-size="11">Pydantic Schemas</text>
+            <rect class="n-rect hi" x="305" y="194" width="330" height="42" rx="3"/><text class="n-text" x="470" y="220" text-anchor="middle" font-size="11">Services Layer</text>
+            <rect class="n-rect hi" x="305" y="270" width="150" height="60" rx="3"/><text class="n-text" x="380" y="296" text-anchor="middle" font-size="11">LangGraph</text><text class="n-sub" x="380" y="313" text-anchor="middle">Agents (7)</text>
+            <rect class="n-rect" x="485" y="270" width="150" height="60" rx="3"/><text class="n-text" x="560" y="296" text-anchor="middle" font-size="11">SQLAlchemy</text><text class="n-sub" x="560" y="313" text-anchor="middle">ORM</text>
+            <path class="edge" d="M470,112 L470,132" marker-end="url(#a102)"/>
+            <path class="edge" d="M470,174 L470,194" marker-end="url(#a102)"/>
+            <path class="edge" d="M420,236 L380,270" marker-end="url(#a102)"/>
+            <path class="edge" d="M520,236 L560,270" marker-end="url(#a102)"/>
+            <path class="edge strong" d="M215,150 L280,150" marker-end="url(#a102)"/>
+            <text class="edge-label" x="222" y="140">REST JSON / SSE</text>
+
+            <rect class="lane-box" x="700" y="20" width="120" height="300"/>
+            <text class="lane-label" x="708" y="42" font-size="9">DATA</text>
+            <ellipse class="store" cx="760" cy="110" rx="52" ry="13"/>
+            <path class="store" d="M708,110 L708,132 A52,13 0 0 0 812,132 L812,110"/>
+            <text class="n-text" x="760" y="115" text-anchor="middle" font-size="10">SQLite</text>
+            <ellipse class="store" cx="760" cy="230" rx="52" ry="13"/>
+            <path class="store" d="M708,230 L708,252 A52,13 0 0 0 812,252 L812,230"/>
+            <text class="n-text" x="760" y="235" text-anchor="middle" font-size="10">ChromaDB</text>
+            <path class="edge" d="M635,290 L760,290 L760,252" marker-end="url(#a102)"/>
+            <text class="edge-label" x="640" y="285">vector search</text>
+            <path class="edge" d="M660,215 L700,180" marker-end="url(#a102)"/>
+            <text class="edge-label" x="655" y="170">SQL</text>
+
+            <rect class="ext-rect" x="700" y="360" width="120" height="60" rx="3"/>
+            <text class="n-text" x="760" y="386" text-anchor="middle" font-size="10.5">OpenAI API</text>
+            <text class="n-sub" x="760" y="403" text-anchor="middle">external</text>
+            <path class="edge" d="M455,300 L455,390 L700,390" marker-end="url(#a102)"/>
+            <text class="edge-label" x="470" y="410">chat + embeddings</text>
+          </svg>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Component Inventory</h3>
+            <table class="spec">
+              <tr><th>Component</th><th>Technology</th></tr>
+              <tr><td class="k">Frontend SPA</td><td>React 18, TypeScript, Vite, Tailwind</td></tr>
+              <tr><td class="k">API Gateway</td><td>FastAPI — validation, auth, routing</td></tr>
+              <tr><td class="k">Schema Layer</td><td>Pydantic v2</td></tr>
+              <tr><td class="k">Agent Layer</td><td>LangGraph + LangChain, 7 agents</td></tr>
+              <tr><td class="k">ORM</td><td>SQLAlchemy → SQLite</td></tr>
+              <tr><td class="k">Vector Store</td><td>ChromaDB</td></tr>
+            </table>
+          </div>
+          <div class="panel-card">
+            <h3>Chat Query — Message Flow</h3>
+            <ol class="steps">
+              <li>Frontend sends <b>POST /api/chat</b></li>
+              <li>Route validates schema, authenticates JWT</li>
+              <li>Service loads conversation context</li>
+              <li>Supervisor Agent invoked with query</li>
+              <li>Routes to Knowledge Retriever → ChromaDB</li>
+              <li>Chunks passed to downstream agents</li>
+              <li>Response streamed via SSE</li>
+              <li>Message + sources persisted</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-102</div></div>
+        <div class="tb-cell"><div class="tb-label">VIEW</div><div class="tb-value">Technical</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">technical_diagram.md</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-103 AGENT WORKFLOW ============ -->
+    <section class="sheet" id="agents">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-103 · ORCHESTRATION VIEW</div>
+          <h1>Agent Workflow</h1>
+          <p class="sub">Seven LangGraph agents route a user query from ingestion or retrieval through to a notified response.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>7 Agents</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-103.1 — AGENT FLOWCHART</span>
+          <svg class="diagram" viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="a103" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6FA8DC"/></marker></defs>
+
+            <ellipse class="n-rect" cx="480" cy="30" rx="90" ry="20"/>
+            <text class="n-text" x="480" y="35" text-anchor="middle" font-size="11">User Query</text>
+
+            <rect class="n-rect hi" x="390" y="80" width="180" height="50" rx="3"/>
+            <text class="n-text" x="480" y="110" text-anchor="middle">Supervisor Agent</text>
+            <path class="edge" d="M480,50 L480,80" marker-end="url(#a103)"/>
+
+            <rect class="n-rect" x="120" y="180" width="200" height="50" rx="3"/>
+            <text class="n-text" x="220" y="210" text-anchor="middle" font-size="11">Document Analyzer</text>
+            <path class="edge" d="M420,120 L220,180" marker-end="url(#a103)"/>
+            <text class="edge-label" x="290" y="150">new document</text>
+
+            <rect class="n-rect hi" x="620" y="180" width="220" height="50" rx="3"/>
+            <text class="n-text" x="730" y="210" text-anchor="middle" font-size="11">Knowledge Retriever</text>
+            <path class="edge" d="M540,120 L730,180" marker-end="url(#a103)"/>
+            <text class="edge-label" x="650" y="150">needs retrieval</text>
+
+            <rect class="n-rect" x="560" y="280" width="180" height="50" rx="3"/>
+            <text class="n-text" x="650" y="310" text-anchor="middle" font-size="11">Conflict Detector</text>
+            <path class="edge" d="M700,230 L660,280" marker-end="url(#a103)"/>
+
+            <rect class="n-rect" x="770" y="280" width="180" height="50" rx="3"/>
+            <text class="n-text" x="860" y="310" text-anchor="middle" font-size="11">Summarization</text>
+            <path class="edge" d="M760,230 L850,280" marker-end="url(#a103)"/>
+
+            <rect class="n-rect hi" x="660" y="380" width="200" height="50" rx="3"/>
+            <text class="n-text" x="760" y="410" text-anchor="middle" font-size="11">Recommendation</text>
+            <path class="edge" d="M650,330 L730,380" marker-end="url(#a103)"/>
+            <path class="edge" d="M860,330 L790,380" marker-end="url(#a103)"/>
+
+            <rect class="n-rect warn" x="360" y="480" width="220" height="50" rx="3"/>
+            <text class="n-text" x="470" y="510" text-anchor="middle" font-size="11">Notification Agent</text>
+            <path class="edge" d="M220,230 L440,480" marker-end="url(#a103)"/>
+            <path class="edge" d="M650,330 L500,480" marker-end="url(#a103)"/>
+            <path class="edge" d="M760,430 L520,480" marker-end="url(#a103)"/>
+
+            <ellipse class="n-rect" cx="470" cy="570" rx="120" ry="20"/>
+            <text class="n-text" x="470" y="575" text-anchor="middle" font-size="11">Response to User</text>
+            <path class="edge strong" d="M470,530 L470,550" marker-end="url(#a103)"/>
+          </svg>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Agent Register</h3>
+            <table class="spec">
+              <tr><th>Agent</th><th>Tools</th></tr>
+              <tr><td class="k">Supervisor</td><td>Router logic, SQLite conversation history</td></tr>
+              <tr><td class="k">Doc Analyzer</td><td>Multi-format loader, OCR, NER</td></tr>
+              <tr><td class="k">Knowledge Retriever</td><td>ChromaDB retriever</td></tr>
+              <tr><td class="k">Conflict Detector</td><td>LLM comparison prompt</td></tr>
+              <tr><td class="k">Summarization</td><td>LLM summarization prompt</td></tr>
+              <tr><td class="k">Recommendation</td><td>LLM reasoning prompt</td></tr>
+              <tr><td class="k">Notification</td><td>Notification service</td></tr>
+            </table>
+          </div>
+          <div class="panel-card">
+            <h3>Error Handling — BR-5</h3>
+            <p class="callout">LLM calls retry with <b>exponential backoff, max 3 attempts</b>. Irrecoverable failures fall back gracefully and log to <b>audit_logs</b>.</p>
+            <p class="callout" style="margin-top:10px;">Conflict Detector and Recommendation require confidence <b>≥ 0.6</b>; below threshold, output is withheld for manual review.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-103</div></div>
+        <div class="tb-cell"><div class="tb-label">VIEW</div><div class="tb-value">Workflow</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">agent_workflow.md</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-104 DATA FLOW - INGESTION ============ -->
+    <section class="sheet" id="ingestion">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-104 · DATA FLOW 1 OF 2</div>
+          <h1>Data Flow — Ingestion</h1>
+          <p class="sub">Raw file to indexed, searchable vector — traced stage by stage.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>Linear Flow</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-104.1 — INGESTION PIPELINE</span>
+          <svg class="diagram" viewBox="0 0 960 340" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="a104" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6FA8DC"/></marker></defs>
+            <ellipse class="n-rect" cx="70" cy="60" rx="65" ry="30"/>
+            <text class="n-text" x="70" y="58" text-anchor="middle" font-size="9.5">User uploads</text>
+            <text class="n-sub" x="70" y="72" text-anchor="middle">PDF/DOCX/PPTX/XLSX/EML</text>
+
+            <rect class="n-rect" x="170" y="30" width="150" height="60" rx="3"/>
+            <text class="n-text" x="245" y="56" text-anchor="middle" font-size="10.5">Document Storage</text>
+            <text class="n-sub" x="245" y="72" text-anchor="middle">filesystem / blob</text>
+            <path class="edge" d="M135,60 L170,60" marker-end="url(#a104)"/>
+
+            <rect class="n-rect hi" x="360" y="30" width="150" height="60" rx="3"/>
+            <text class="n-text" x="435" y="52" text-anchor="middle" font-size="10">Format-Aware</text>
+            <text class="n-text" x="435" y="66" text-anchor="middle" font-size="10">Loader</text>
+            <text class="n-sub" x="435" y="80" text-anchor="middle">text · tables · OCR</text>
+            <path class="edge" d="M320,60 L360,60" marker-end="url(#a104)"/>
+
+            <rect class="n-rect" x="550" y="30" width="150" height="60" rx="3"/>
+            <text class="n-text" x="625" y="56" text-anchor="middle" font-size="10.5">Text Chunker</text>
+            <text class="n-sub" x="625" y="72" text-anchor="middle">500 tok · 50 overlap</text>
+            <path class="edge" d="M510,60 L550,60" marker-end="url(#a104)"/>
+
+            <rect class="n-rect hi" x="740" y="30" width="180" height="60" rx="3"/>
+            <text class="n-text" x="830" y="56" text-anchor="middle" font-size="10.5">Embedding Generator</text>
+            <text class="n-sub" x="830" y="72" text-anchor="middle">OpenAI embeddings</text>
+            <path class="edge" d="M700,60 L740,60" marker-end="url(#a104)"/>
+
+            <ellipse class="store" cx="700" cy="200" rx="95" ry="15"/>
+            <path class="store" d="M605,200 L605,230 A95,15 0 0 0 795,230 L795,200"/>
+            <text class="n-text" x="700" y="206" text-anchor="middle" font-size="11">ChromaDB</text>
+            <text class="n-sub" x="700" y="244" text-anchor="middle">store vectors</text>
+            <path class="edge" d="M830,90 L830,150 L700,150 L700,185" marker-end="url(#a104)"/>
+
+            <ellipse class="store" cx="420" cy="200" rx="105" ry="15"/>
+            <path class="store" d="M315,200 L315,230 A105,15 0 0 0 525,230 L525,200"/>
+            <text class="n-text" x="420" y="206" text-anchor="middle" font-size="11">SQLite</text>
+            <text class="n-sub" x="420" y="244" text-anchor="middle">document_chunks table</text>
+            <path class="edge" d="M830,90 L830,150 L420,150 L420,185" marker-end="url(#a104)"/>
+
+            <ellipse class="n-rect warn" cx="700" cy="300" rx="130" ry="24"/>
+            <text class="n-text" x="700" y="298" text-anchor="middle" font-size="10.5">Notify user:</text>
+            <text class="n-text" x="700" y="312" text-anchor="middle" font-size="10.5">indexing complete</text>
+            <path class="edge" d="M700,230 L700,276" marker-end="url(#a104)"/>
+          </svg>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Data Elements — Ingestion</h3>
+            <table class="spec">
+              <tr><th>Stage</th><th>Output</th></tr>
+              <tr><td class="k">Upload</td><td>Stored file + document row (status=uploaded)</td></tr>
+              <tr><td class="k">Extraction</td><td>Raw text (incl. flattened tables, OCR text)</td></tr>
+              <tr><td class="k">Chunking</td><td>List of text chunks, 500 tok / 50 overlap</td></tr>
+              <tr><td class="k">Embedding</td><td>1536-dim vector embeddings</td></tr>
+              <tr><td class="k">Storage</td><td>ChromaDB entries + document_chunks rows</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-104</div></div>
+        <div class="tb-cell"><div class="tb-label">FLOW</div><div class="tb-value">Ingestion</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">data_flow_diagram.md</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-105 DATA FLOW - QUERY ============ -->
+    <section class="sheet" id="query">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-105 · DATA FLOW 2 OF 2</div>
+          <h1>Data Flow — Query &amp; Retrieval</h1>
+          <p class="sub">A user question becomes a cited, generated answer and a persisted chat record.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>Linear Flow</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-105.1 — QUERY PIPELINE</span>
+          <svg class="diagram" viewBox="0 0 960 360" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="a105" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6FA8DC"/></marker></defs>
+
+            <ellipse class="n-rect" cx="60" cy="60" rx="55" ry="28"/>
+            <text class="n-text" x="60" y="58" text-anchor="middle" font-size="9.5">User submits</text>
+            <text class="n-sub" x="60" y="72" text-anchor="middle">query</text>
+
+            <rect class="n-rect" x="150" y="32" width="150" height="56" rx="3"/>
+            <text class="n-text" x="225" y="64" text-anchor="middle" font-size="10.5">Generate query</text>
+            <text class="n-text" x="225" y="78" text-anchor="middle" font-size="10.5" dy="-4">embedding</text>
+            <path class="edge" d="M115,60 L150,60" marker-end="url(#a105)"/>
+
+            <ellipse class="store" cx="420" cy="60" rx="95" ry="15"/>
+            <path class="store" d="M325,60 L325,90 A95,15 0 0 0 515,90 L515,60"/>
+            <text class="n-text" x="420" y="55" text-anchor="middle" font-size="10">ChromaDB</text>
+            <text class="n-sub" x="420" y="103" text-anchor="middle">semantic search, top-K</text>
+            <path class="edge" d="M300,60 L325,60" marker-end="url(#a105)"/>
+
+            <rect class="n-rect" x="580" y="32" width="170" height="56" rx="3"/>
+            <text class="n-text" x="665" y="55" text-anchor="middle" font-size="10">Retrieve source</text>
+            <text class="n-text" x="665" y="70" text-anchor="middle" font-size="10">document metadata</text>
+            <path class="edge" d="M515,60 L580,60" marker-end="url(#a105)"/>
+
+            <rect class="n-rect hi" x="800" y="32" width="150" height="56" rx="3"/>
+            <text class="n-text" x="875" y="55" text-anchor="middle" font-size="10">Build LLM</text>
+            <text class="n-text" x="875" y="70" text-anchor="middle" font-size="10">context window</text>
+            <path class="edge" d="M750,60 L800,60" marker-end="url(#a105)"/>
+
+            <rect class="ext-rect" x="800" y="150" width="150" height="56" rx="3"/>
+            <text class="n-text" x="875" y="173" text-anchor="middle" font-size="10">LLM generates</text>
+            <text class="n-text" x="875" y="188" text-anchor="middle" font-size="10">response</text>
+            <path class="edge" d="M875,88 L875,150" marker-end="url(#a105)"/>
+
+            <ellipse class="n-rect warn" cx="600" cy="178" rx="120" ry="26"/>
+            <text class="n-text" x="600" y="176" text-anchor="middle" font-size="10">Response + citations</text>
+            <text class="n-text" x="600" y="190" text-anchor="middle" font-size="10">returned to user</text>
+            <path class="edge" d="M800,178 L720,178" marker-end="url(#a105)"/>
+
+            <ellipse class="store" cx="600" cy="280" rx="105" ry="15"/>
+            <path class="store" d="M495,280 L495,310 A105,15 0 0 0 705,310 L705,280"/>
+            <text class="n-text" x="600" y="286" text-anchor="middle" font-size="11">SQLite</text>
+            <text class="n-sub" x="600" y="324" text-anchor="middle">persist chat_messages</text>
+            <path class="edge" d="M600,204 L600,265" marker-end="url(#a105)"/>
+          </svg>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Data Elements — Query</h3>
+            <table class="spec">
+              <tr><th>Stage</th><th>Output</th></tr>
+              <tr><td class="k">Query embedding</td><td>Query vector</td></tr>
+              <tr><td class="k">Semantic search</td><td>Top-K chunks with similarity scores</td></tr>
+              <tr><td class="k">Context assembly</td><td>Formatted LLM prompt context</td></tr>
+              <tr><td class="k">Generation</td><td>Natural language answer + source list</td></tr>
+              <tr><td class="k">Persistence</td><td>chat_messages row</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-105</div></div>
+        <div class="tb-cell"><div class="tb-label">FLOW</div><div class="tb-value">Query &amp; Retrieval</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">data_flow_diagram.md</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-106 SECURITY ARCHITECTURE ============ -->
+    <section class="sheet" id="security">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-106 · SECURITY VIEW</div>
+          <h1>Security Architecture</h1>
+          <p class="sub">Authentication, role-based authorization, row-level scoping, and audit logging around every request.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>9 Controls</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-106.1 — AUTH &amp; ACCESS FLOW</span>
+          <svg class="diagram" viewBox="0 0 960 460" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="a106" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6FA8DC"/></marker></defs>
+
+            <ellipse class="n-rect" cx="70" cy="60" rx="50" ry="26"/>
+            <text class="n-text" x="70" y="65" text-anchor="middle" font-size="11">User</text>
+
+            <rect class="n-rect hi" x="190" y="34" width="200" height="52" rx="3"/>
+            <text class="n-text" x="290" y="56" text-anchor="middle" font-size="10.5">Auth Service</text>
+            <text class="n-sub" x="290" y="72" text-anchor="middle">JWT issuance</text>
+            <path class="edge" d="M120,55 L190,55" marker-end="url(#a106)"/>
+            <text class="edge-label" x="128" y="45">credentials</text>
+            <path class="edge" d="M190,70 L120,70" marker-end="url(#a106)"/>
+            <text class="edge-label" x="128" y="95">access + refresh</text>
+
+            <rect class="n-rect hi" x="450" y="34" width="220" height="52" rx="3"/>
+            <text class="n-text" x="560" y="56" text-anchor="middle" font-size="10.5">FastAPI</text>
+            <text class="n-sub" x="560" y="72" text-anchor="middle">dependency: verify_token</text>
+            <path class="edge" d="M70,86 L70,150 L450,150 L450,65" marker-end="url(#a106)"/>
+            <text class="edge-label" x="200" y="145">Bearer token</text>
+
+            <polygon class="diamond" points="560,140 660,190 560,240 460,190"/>
+            <text class="n-text" x="560" y="185" text-anchor="middle" font-size="9.5">Role-based</text>
+            <text class="n-text" x="560" y="198" text-anchor="middle" font-size="9.5">Authorization</text>
+            <path class="edge" d="M560,86 L560,140" marker-end="url(#a106)"/>
+
+            <rect class="n-rect" x="330" y="270" width="200" height="50" rx="3"/>
+            <text class="n-text" x="430" y="292" text-anchor="middle" font-size="10">Row-level scoping</text>
+            <text class="n-sub" x="430" y="308" text-anchor="middle">customer_id filter</text>
+            <path class="edge" d="M480,220 L430,270" marker-end="url(#a106)"/>
+            <text class="edge-label" x="400" y="245">user</text>
+
+            <rect class="n-rect" x="600" y="270" width="180" height="50" rx="3"/>
+            <text class="n-text" x="690" y="300" text-anchor="middle" font-size="10.5">Admin-only routes</text>
+            <path class="edge" d="M630,220 L690,270" marker-end="url(#a106)"/>
+            <text class="edge-label" x="660" y="245">admin</text>
+
+            <ellipse class="store" cx="560" cy="400" rx="120" ry="16"/>
+            <path class="store" d="M440,400 L440,430 A120,16 0 0 0 680,430 L680,400"/>
+            <text class="n-text" x="560" y="406" text-anchor="middle" font-size="10.5">SQLite</text>
+            <text class="n-sub" x="560" y="444" text-anchor="middle">parameterized queries</text>
+            <path class="edge" d="M430,320 L500,395" marker-end="url(#a106)"/>
+            <path class="edge" d="M690,320 L620,395" marker-end="url(#a106)"/>
+
+            <rect class="n-rect warn" x="740" y="140" width="180" height="50" rx="3"/>
+            <text class="n-text" x="830" y="162" text-anchor="middle" font-size="10">Audit Logging</text>
+            <text class="n-sub" x="830" y="178" text-anchor="middle">middleware</text>
+            <path class="edge" d="M670,60 L830,60 L830,140" marker-end="url(#a106)"/>
+            <path class="edge" d="M830,190 L830,393 L680,415" marker-end="url(#a106)"/>
+
+            <rect class="ext-rect" x="740" y="34" width="180" height="52" rx="3"/>
+            <text class="n-text" x="830" y="56" text-anchor="middle" font-size="10.5">Client</text>
+            <text class="n-sub" x="830" y="72" text-anchor="middle">HTTPS enforced</text>
+            <path class="edge" d="M670,55 L740,55" marker-end="url(#a106)"/>
+            <text class="edge-label" x="678" y="45">TLS</text>
+          </svg>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Controls Register</h3>
+            <table class="spec">
+              <tr><th>Control</th><th>Implementation</th></tr>
+              <tr><td class="k">AuthN</td><td>JWT access (15m) + refresh (7d) via /api/auth/login</td></tr>
+              <tr><td class="k">AuthZ</td><td>Role field on customers; route-level checks</td></tr>
+              <tr><td class="k">Transit</td><td>HTTPS/TLS at reverse proxy</td></tr>
+              <tr><td class="k">At rest</td><td>SQLCipher (optional), disk encryption</td></tr>
+              <tr><td class="k">Audit</td><td>Every mutating request → audit_logs</td></tr>
+              <tr><td class="k">API</td><td>Rate limiting, Pydantic validation, size limits</td></tr>
+              <tr><td class="k">DB</td><td>SQLAlchemy parameterized queries only</td></tr>
+              <tr><td class="k">Prompt injection</td><td>prompt_injection_filter.py sanitizes input</td></tr>
+              <tr><td class="k">Secrets</td><td>Environment variables via .env, never committed</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-106</div></div>
+        <div class="tb-cell"><div class="tb-label">VIEW</div><div class="tb-value">Security</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">security_architecture.md</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-107 DEPLOYMENT ARCHITECTURE ============ -->
+    <section class="sheet" id="deployment">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-107 · DEPLOYMENT VIEW</div>
+          <h1>Deployment Architecture</h1>
+          <p class="sub">Three containers on a single Docker host, one externally exposed port.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>3 Services</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-107.1 — CONTAINER TOPOLOGY</span>
+          <svg class="diagram" viewBox="0 0 960 460" xmlns="http://www.w3.org/2000/svg">
+            <defs><marker id="a107" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6FA8DC"/></marker></defs>
+
+            <ellipse class="ext-rect" cx="70" cy="230" rx="55" ry="28"/>
+            <text class="n-text" x="70" y="235" text-anchor="middle" font-size="10.5">Browser</text>
+
+            <rect class="lane-box" x="200" y="40" width="720" height="380"/>
+            <text class="lane-label" x="212" y="62">DOCKER HOST</text>
+
+            <rect class="n-rect hi" x="230" y="90" width="200" height="90" rx="3"/>
+            <text class="n-sub" x="330" y="108" text-anchor="middle">frontend container</text>
+            <rect class="n-rect" x="245" y="120" width="170" height="46" rx="3"/>
+            <text class="n-text" x="330" y="147" text-anchor="middle" font-size="10">nginx + Vite build</text>
+            <path class="edge strong" d="M125,230 L245,155" marker-end="url(#a107)"/>
+            <text class="edge-label" x="150" y="200">:80</text>
+
+            <rect class="n-rect hi" x="470" y="90" width="200" height="90" rx="3"/>
+            <text class="n-sub" x="570" y="108" text-anchor="middle">backend container</text>
+            <rect class="n-rect" x="485" y="120" width="170" height="46" rx="3"/>
+            <text class="n-text" x="570" y="147" text-anchor="middle" font-size="10">uvicorn + FastAPI</text>
+            <path class="edge" d="M430,143 L470,143" marker-end="url(#a107)"/>
+            <text class="edge-label" x="435" y="132">/api proxy :8000</text>
+
+            <rect class="n-rect hi" x="710" y="90" width="180" height="90" rx="3"/>
+            <text class="n-sub" x="800" y="108" text-anchor="middle">chromadb container</text>
+            <rect class="n-rect" x="725" y="120" width="150" height="46" rx="3"/>
+            <text class="n-text" x="800" y="147" text-anchor="middle" font-size="10">ChromaDB server</text>
+            <path class="edge" d="M670,143 L710,143" marker-end="url(#a107)"/>
+            <text class="edge-label" x="672" y="132">:8001</text>
+
+            <ellipse class="store" cx="570" cy="330" rx="105" ry="15"/>
+            <path class="store" d="M465,330 L465,358 A105,15 0 0 0 675,358 L675,330"/>
+            <text class="n-text" x="570" y="335" text-anchor="middle" font-size="10.5">sqlite_data volume</text>
+            <path class="edge" d="M570,180 L570,318" marker-end="url(#a107)"/>
+
+            <ellipse class="store" cx="800" cy="330" rx="100" ry="15"/>
+            <path class="store" d="M700,330 L700,358 A100,15 0 0 0 900,358 L900,330"/>
+            <text class="n-text" x="800" y="335" text-anchor="middle" font-size="10.5">chroma_data volume</text>
+            <path class="edge" d="M800,180 L800,318" marker-end="url(#a107)"/>
+          </svg>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Service Map</h3>
+            <table class="spec">
+              <tr><th>Service</th><th>Ports</th><th>Depends</th></tr>
+              <tr><td class="k">frontend</td><td>80:80</td><td>backend</td></tr>
+              <tr><td class="k">backend</td><td>8000:8000</td><td>chromadb</td></tr>
+              <tr><td class="k">chromadb</td><td>8001:8000</td><td>—</td></tr>
+            </table>
+          </div>
+          <div class="panel-card">
+            <h3>Environment Variables</h3>
+            <table class="spec">
+              <tr><td class="k">OPENAI_API_KEY</td><td>backend — LLM / embedding access</td></tr>
+              <tr><td class="k">DATABASE_URL</td><td>backend — SQLite connection</td></tr>
+              <tr><td class="k">CHROMA_HOST/PORT</td><td>backend — ChromaDB connection</td></tr>
+              <tr><td class="k">JWT_SECRET_KEY</td><td>backend — token signing</td></tr>
+              <tr><td class="k">VITE_API_BASE_URL</td><td>frontend — API base URL</td></tr>
+            </table>
+          </div>
+          <div class="panel-card">
+            <h3>Network</h3>
+            <p class="callout">All services share Docker bridge <b>app-network</b>. Only frontend port 80 is exposed externally in production.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-107</div></div>
+        <div class="tb-cell"><div class="tb-label">VIEW</div><div class="tb-value">Deployment</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">deployment_architecture.md</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+    <!-- ============ A-108 LEGEND ============ -->
+    <section class="sheet" id="legend">
+      <span class="reg tl"></span><span class="reg tr"></span><span class="reg bl"></span><span class="reg br"></span>
+      <div class="sheet-header">
+        <div>
+          <div class="eyebrow mono">SHEET A-108 · REFERENCE</div>
+          <h1>Legend &amp; Stack Index</h1>
+          <p class="sub">Symbol conventions used across sheets A-101 through A-107, and the full technology stack referenced in this set.</p>
+        </div>
+        <div class="scale-tag mono"><b>NTS</b>End of Set</div>
+      </div>
+
+      <div class="sheet-body">
+        <div class="diagram-frame">
+          <span class="tag mono">FIG A-108.1 — SYMBOL LEGEND</span>
+          <div class="legend-grid" style="padding:20px 10px;">
+            <div class="legend-item">
+              <svg width="60" height="30"><rect x="4" y="4" width="52" height="22" rx="3" fill="#0E1A2C" stroke="#4FD1C5" stroke-width="1.3"/></svg>
+              <span><b>Cyan solid</b> — internally owned service, emphasized</span>
+            </div>
+            <div class="legend-item">
+              <svg width="60" height="30"><rect x="4" y="4" width="52" height="22" rx="3" fill="#0E1A2C" stroke="#6FA8DC" stroke-width="1.3"/></svg>
+              <span><b>Blue solid</b> — internal component, standard</span>
+            </div>
+            <div class="legend-item">
+              <svg width="60" height="30"><rect x="4" y="4" width="52" height="22" rx="3" fill="#0E1A2C" stroke="#E3A857" stroke-width="1.3" stroke-dasharray="5 3"/></svg>
+              <span><b>Amber dashed</b> — external or third-party dependency</span>
+            </div>
+            <div class="legend-item">
+              <svg width="60" height="30"><rect x="4" y="4" width="52" height="22" rx="3" fill="#0E1A2C" stroke="#E3A857" stroke-width="1.3"/></svg>
+              <span><b>Amber solid</b> — checkpoint requiring policy or threshold</span>
+            </div>
+            <div class="legend-item">
+              <svg width="60" height="30"><ellipse cx="30" cy="18" rx="24" ry="7" fill="#0E1A2C" stroke="#4FD1C5" stroke-width="1.3"/><path d="M6,18 L6,25 A24,7 0 0 0 54,25 L54,18" fill="#0E1A2C" stroke="#4FD1C5" stroke-width="1.3"/></svg>
+              <span><b>Cylinder</b> — persistent data store</span>
+            </div>
+            <div class="legend-item">
+              <svg width="60" height="30"><polygon points="30,4 54,18 30,32 6,18" fill="#0E1A2C" stroke="#E3A857" stroke-width="1.3"/></svg>
+              <span><b>Diamond</b> — branching decision point</span>
+            </div>
+            <div class="legend-item">
+              <svg width="60" height="30"><line x1="6" y1="18" x2="48" y2="18" stroke="#6FA8DC" stroke-width="1.3"/><polygon points="48,14 56,18 48,22" fill="#6FA8DC"/></svg>
+              <span><b>Solid arrow</b> — synchronous call or direct handoff</span>
+            </div>
+            <div class="legend-item">
+              <svg width="60" height="30"><rect x="4" y="4" width="52" height="22" fill="none" stroke="#7189A6" stroke-width="1" stroke-dasharray="3 4"/></svg>
+              <span><b>Dashed lane</b> — logical grouping / architectural layer</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-panel">
+          <div class="panel-card">
+            <h3>Full Stack Index</h3>
+            <table class="spec">
+              <tr><td class="k">Frontend</td><td>React 18 · TypeScript · Vite · Tailwind</td></tr>
+              <tr><td class="k">Backend</td><td>FastAPI · Python 3.12 · Pydantic v2</td></tr>
+              <tr><td class="k">Orchestration</td><td>LangGraph · LangChain · 7 agents</td></tr>
+              <tr><td class="k">Relational DB</td><td>SQLite · SQLAlchemy ORM</td></tr>
+              <tr><td class="k">Vector DB</td><td>ChromaDB</td></tr>
+              <tr><td class="k">LLM Provider</td><td>OpenAI / Azure OpenAI</td></tr>
+              <tr><td class="k">Containers</td><td>Docker · docker-compose · 3 services</td></tr>
+              <tr><td class="k">Transport</td><td>HTTPS/TLS · REST · SSE</td></tr>
+            </table>
+          </div>
+          <div class="panel-card">
+            <h3>Set Contents</h3>
+            <p class="callout">A-100 Cover · A-101 Logical · A-102 Technical · A-103 Agent Workflow · A-104–105 Data Flow · A-106 Security · A-107 Deployment · A-108 Legend.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="title-block mono">
+        <div class="tb-cell"><div class="tb-label">PROJECT</div><div class="tb-value accent">RAG Intelligence Platform — End of Drawing Set</div></div>
+        <div class="tb-cell"><div class="tb-label">SHEET</div><div class="tb-value">A-108</div></div>
+        <div class="tb-cell"><div class="tb-label">VIEW</div><div class="tb-value">Legend</div></div>
+        <div class="tb-cell"><div class="tb-label">SOURCE</div><div class="tb-value">all sheets</div></div>
+        <div class="tb-cell"><div class="tb-label">REV</div><div class="tb-value">1</div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="scroll-hint">SCROLL / ARROW KEYS TO NAVIGATE SHEETS</div>
+
+<script>
+  const links = Array.from(document.querySelectorAll('#idxList a'));
+  const sections = links.map(a => document.querySelector(a.getAttribute('href')));
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = sections.indexOf(entry.target);
+      if (idx === -1) return;
+      if (entry.isIntersecting){
+        links.forEach(l => l.classList.remove('active'));
+        links[idx].classList.add('active');
+      }
+    });
+  }, { root: null, threshold: 0.5 });
+
+  sections.forEach(s => s && io.observe(s));
+
+  // keyboard nav between sheets
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const current = sections.findIndex(s => {
+      const r = s.getBoundingClientRect();
+      return r.top <= window.innerHeight/2 && r.bottom >= window.innerHeight/2;
+    });
+    let next = current;
+    if (e.key === 'ArrowDown') next = Math.min(sections.length - 1, current + 1);
+    if (e.key === 'ArrowUp') next = Math.max(0, current - 1);
+    if (next !== current && sections[next]){
+      e.preventDefault();
+      sections[next].scrollIntoView({behavior:'smooth'});
+    }
+  });
+</script>
+</body>
+</html>
